@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  date:
+  maxmind:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -16,12 +16,19 @@ jobs:
 
       - name: add license to urls and download
         run: |
-          cat maxmind-urls.txt | sed 's/YOUR_LICENSE_KEY/${{ secrets.MAXMIND_KEY }}/g' | xargs -n1 -P2 wget --content-disposition 
+          mkdir maxmind && cd maxmind
+          cat ../maxmind-urls.txt | sed 's/YOUR_LICENSE_KEY/${{ secrets.MAXMIND_KEY }}/g' | xargs -n1 -P2 wget -nv --content-disposition 
 
       - name: list files
         run: |
           tree
 
       - name: upload files
-        run: |
-          echo 'upload no-op'
+        uses: jakejarvis/s3-sync-action@master
+        env:
+          AWS_S3_BUCKET: ${{ secrets.S3_BUCKETNAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESSKEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRETKEY }}
+          AWS_REGION: 'eu-central-1'   # optional: defaults to us-east-1
+          SOURCE_DIR: 'maxmind'      # optional: defaults to entire repository
+          AWS_S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
