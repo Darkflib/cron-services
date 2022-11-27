@@ -1,0 +1,28 @@
+name: Commit date to master
+on:
+  schedule:
+  - cron: '20 4 * * *' # 5.20am every 5 days
+  workflow_dispatch:
+
+jobs:
+  date:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: add packages
+        run: |
+          apt-get update && apt-get -y install curl wget s3cmd sed xargs awk tree
+
+      - name: add license to urls
+        run: |
+          cat maxmind-urls.txt | sed 's/YOUR_LICENSE_KEY/${{ secrets.MAXMIND_KEY }}/g' | xargs -v -n1 -P2 wget --content-disposition 
+
+      - name: list files
+        run: |
+          tree
+
+      - name: upload files
+        run: |
+          echo 'upload no-op'
