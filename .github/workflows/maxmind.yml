@@ -31,4 +31,5 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRETKEY }}
           AWS_REGION: 'eu-central-1'   # optional: defaults to us-east-1
           SOURCE_DIR: 'maxmind'      # optional: defaults to entire repository
+          DEST_DIR: 'Maxmind'
           AWS_S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
