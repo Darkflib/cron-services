@@ -1,7 +1,7 @@
-name: Commit date to master
+name: Maxmind sync
 on:
   schedule:
-  - cron: '20 4 * * *' # 5.20am every 5 days
+  - cron: '20 4 * * *'
   workflow_dispatch:
 
 jobs:
@@ -12,10 +12,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: add packages
-        run: |
-          apt-get update && apt-get -y install curl wget s3cmd sed xargs awk tree
+        run: sudo apt-get update && sudo apt-get -y install curl wget s3cmd sed xargs awk tree
 
-      - name: add license to urls
+      - name: add license to urls and download
         run: |
           cat maxmind-urls.txt | sed 's/YOUR_LICENSE_KEY/${{ secrets.MAXMIND_KEY }}/g' | xargs -v -n1 -P2 wget --content-disposition 
 
