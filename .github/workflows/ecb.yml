@@ -1,11 +1,11 @@
-name: Maxmind sync
+name: ECB sync
 on:
   schedule:
   - cron: '0 18 * * *'
   workflow_dispatch:
 
 jobs:
-  maxmind:
+  ecb:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
