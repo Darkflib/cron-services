@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: add packages
-        run: sudo apt-get update && sudo apt-get -y install curl wget s3cmd sed xargs awk tree
+        run: sudo apt-get update && sudo apt-get -y install curl wget s3cmd sed xargs tree
 
       - name: add license to urls and download
         run: |
