@@ -1,36 +1,9 @@
-# This workflow warns and then closes issues and PRs that have had no activity for a specified amount of time.
-#
-# You can adjust the behavior by modifying this file.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 name: Commit date to master
 on:
   schedule:
-  - cron: '20 5 */10 * *'
-  
+  - cron: '20 5 */5 * *' # 5.20am every 5 days
+  workflow_dispatch:
+
 jobs:
   date:
     runs-on: ubuntu-latest
