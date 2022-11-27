@@ -16,7 +16,7 @@ jobs:
 
       - name: add license to urls and download
         run: |
-          cat maxmind-urls.txt | sed 's/YOUR_LICENSE_KEY/${{ secrets.MAXMIND_KEY }}/g' | xargs -v -n1 -P2 wget --content-disposition 
+          cat maxmind-urls.txt | sed 's/YOUR_LICENSE_KEY/${{ secrets.MAXMIND_KEY }}/g' | xargs -n1 -P2 wget --content-disposition 
 
       - name: list files
         run: |
