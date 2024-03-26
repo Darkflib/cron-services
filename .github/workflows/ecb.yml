@@ -24,5 +24,18 @@ jobs:
         run: |
           tree
 
-# Upload to gdrive using rclone
+      - name: dump env
+        run: |
+          env |sort
+          pwd
+  
+      # Setup rclone config from GitHub Secrets
+      - name: Setup rclone
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+        run: |
+          echo "$RCLONE_CONF" > ~/.config/rclone/rclone.conf
+          rclone listremotes
+          rclone ls gdrive:
+            
 
