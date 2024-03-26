@@ -24,10 +24,10 @@ jobs:
         run: |
           tree
 
-      - name: dump env
-        run: |
-          env |sort
-          pwd
+#      - name: dump env
+#        run: |
+#          env |sort
+#          pwd
   
       # Setup rclone config from GitHub Secrets
       - name: Setup rclone
@@ -35,7 +35,7 @@ jobs:
           RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
         run: |
           mkdir -p ~/.config/rclone/
-          wget https://downloads.rclone.org/v1.66.0/rclone-v1.66.0-linux-amd64.deb
+          wget -q https://downloads.rclone.org/v1.66.0/rclone-v1.66.0-linux-amd64.deb
           sudo dpkg -i rclone-v1.66.0-linux-amd64.deb
           echo "$RCLONE_CONF" > ~/.config/rclone/rclone.conf
           rclone listremotes
