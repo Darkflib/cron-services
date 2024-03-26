@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: add packages
         run: sudo apt-get update && sudo apt-get -y install curl wget sed tree
@@ -24,13 +24,5 @@ jobs:
         run: |
           tree
 
-      - name: upload files
-        uses: jakejarvis/s3-sync-action@7ed8b112447abb09f1da74f3466e4194fc7a6311
-        env:
-          AWS_S3_BUCKET: ${{ secrets.S3_BUCKETNAME }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESSKEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRETKEY }}
-          AWS_REGION: 'eu-central-1'   # optional: defaults to us-east-1
-          SOURCE_DIR: 'ecb'      # optional: defaults to entire repository
-          DEST_DIR: 'ECB'
-          AWS_S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+# Upload to gdrive using rclone
+
