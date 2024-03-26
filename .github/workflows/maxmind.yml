@@ -23,13 +23,15 @@ jobs:
         run: |
           tree
 
-      - name: upload files
-        uses: jakejarvis/s3-sync-action@7ed8b112447abb09f1da74f3466e4194fc7a6311
+ 
+    # Setup rclone config from GitHub Secrets
+      - name: Setup rclone
         env:
-          AWS_S3_BUCKET: ${{ secrets.S3_BUCKETNAME }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESSKEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRETKEY }}
-          AWS_REGION: 'eu-central-1'   # optional: defaults to us-east-1
-          SOURCE_DIR: 'maxmind'      # optional: defaults to entire repository
-          DEST_DIR: 'Maxmind'
-          AWS_S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+        run: |
+          pwd
+          mkdir -p ~/.config/rclone/
+          wget -q https://downloads.rclone.org/v1.66.0/rclone-v1.66.0-linux-amd64.deb
+          sudo dpkg -i rclone-v1.66.0-linux-amd64.deb
+          echo "$RCLONE_CONF" > ~/.config/rclone/rclone.conf
+          rclone sync maxmind gdrive:maxmind/
