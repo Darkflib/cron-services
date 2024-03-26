@@ -20,6 +20,7 @@ jobs:
           wget -nv --content-disposition https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml
           wget -nv --content-disposition https://www.ecb.europa.eu/stats/eurofxref/eurofxref.zip
           wget -nv --content-disposition https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml
+          
       - name: list files
         run: |
           tree
@@ -39,7 +40,6 @@ jobs:
           wget -q https://downloads.rclone.org/v1.66.0/rclone-v1.66.0-linux-amd64.deb
           sudo dpkg -i rclone-v1.66.0-linux-amd64.deb
           echo "$RCLONE_CONF" > ~/.config/rclone/rclone.conf
-          rclone listremotes
-          rclone sync ecb gdrive:ecb
+          rclone sync ecb gdrive:ecb/
             
 
