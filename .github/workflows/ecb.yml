@@ -34,11 +34,12 @@ jobs:
         env:
           RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
         run: |
+          pwd
           mkdir -p ~/.config/rclone/
           wget -q https://downloads.rclone.org/v1.66.0/rclone-v1.66.0-linux-amd64.deb
           sudo dpkg -i rclone-v1.66.0-linux-amd64.deb
           echo "$RCLONE_CONF" > ~/.config/rclone/rclone.conf
           rclone listremotes
-          rclone ls gdrive:
+          rclone sync ecb gdrive:ecb
             
 
