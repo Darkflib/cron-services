@@ -22,7 +22,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FILE_TO_COMMIT: time.txt
-          DESTINATION_BRANCH: data
+          DESTINATION_BRANCH: main
         run: |
           export TODAY=$( date -u '+%Y-%m-%d' )
           export MESSAGE="chore: regenerate $FILE_TO_COMMIT for $TODAY"
@@ -32,5 +32,5 @@ jobs:
             --field message="$MESSAGE" \
             --field content="$CONTENT" \
             --field encoding="base64" \
-            --field branch="main" \
+            --field branch="$DESTINATION_BRANCH" \
             --field sha="$SHA"
