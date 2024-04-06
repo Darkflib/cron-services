@@ -17,15 +17,20 @@ jobs:
           # do some operation that changes a file in the git repo
           date > time.txt
 
-      - name: setup git config
-        run: |
-          # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-
-      - name: commit
-        run: |
-          # Stage the file, commit and push
-          git add time.txt
-          git commit -m "new date commit"
-          git push origin main
+    # Use the REST API to commit changes, so we get automatic commit signing
+    - name: Commit changes
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        FILE_TO_COMMIT: time.txt
+        DESTINATION_BRANCH: data
+      run: |
+        export TODAY=$( date -u '+%Y-%m-%d' )
+        export MESSAGE="chore: regenerate $FILE_TO_COMMIT for $TODAY"
+        export SHA=$( git rev-parse $DESTINATION_BRANCH:$FILE_TO_COMMIT )
+        export CONTENT=$( base64 -i $FILE_TO_COMMIT )
+        gh api --method PUT /repos/:owner/:repo/contents/$FILE_TO_COMMIT \
+          --field message="$MESSAGE" \
+          --field content="$CONTENT" \
+          --field encoding="base64" \
+          --field branch="${{ github.head_ref }}" \
+          --field sha="$SHA"
