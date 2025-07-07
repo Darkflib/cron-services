@@ -17,7 +17,7 @@ jobs:
       - name: add license to urls and download
         run: |
           mkdir codelist && cd codelist
-          cat ../ofcom-urls.txt | xargs -n1 -P2 wget -nv --content-disposition 
+          cat ../ofcom-urls.txt | xargs -n1 -P2 wget -v --content-disposition 
 
       - name: list files
         run: |
