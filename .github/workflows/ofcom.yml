@@ -19,7 +19,7 @@ jobs:
           mkdir codelist && cd codelist
           #cat ../ofcom-urls.txt | xargs -n1 -P2 wget -v --content-disposition 
           # seeing 403 errors, need to see the errors etc.
-          curl -Sv "https://www.ofcom.org.uk/siteassets/resources/documents/phones-telecoms-and-internet/information-for-industry/numbering/regular-updates/telephone-numbers/codelist.zip?v=399654" > codelist.zip
+          curl -Sv "https://www.ofcom.org.uk/siteassets/resources/documents/phones-telecoms-and-internet/information-for-industry/numbering/regular-updates/telephone-numbers/codelist.zip" > codelist.zip
           file codelist.zip # get magic for type identification
           cat codelist.zip |strings # see if there is anything readable
 
