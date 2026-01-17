@@ -1,5 +1,10 @@
+# Git
+.git
+.gitignore
+.github
+
 # Python
-__pycache__/
+__pycache__
 *.py[cod]
 *$py.class
 *.so
@@ -17,7 +22,6 @@ venv/
 *.swp
 *.swo
 *~
-.DS_Store
 
 # Testing
 .pytest_cache/
@@ -25,8 +29,13 @@ venv/
 htmlcov/
 .tox/
 
-# Local files
-time.txt
+# Documentation
+*.md
+!README.md
 
-# uv
-uv.lock
+# Other
+.DS_Store
+time.txt
+renovate.json
+terraform/.terraform/
+terraform/*.tfstate*
