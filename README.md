@@ -107,6 +107,16 @@ export IMAGE_URL="${REGION}-docker.pkg.dev/${PROJECT_ID}/cron-services/cron-serv
 # Configure Docker/Podman for Artifact Registry
 gcloud auth configure-docker ${REGION}-docker.pkg.dev
 
+### Create Artifact Registry Repository
+
+```bash
+# Create repository for container images
+gcloud artifacts repositories create cron-services \
+  --repository-format=docker \
+  --location=${REGION} \
+  --description="Cron services container images"
+```
+
 # Build and push
 podman build -t ${IMAGE_URL} .
 podman push ${IMAGE_URL}
@@ -142,7 +152,7 @@ echo -n "your-license-key" | gcloud secrets versions add maxmind-license-key --d
 
 ```bash
 # Trigger a job manually
-gcloud run jobs execute cron-ecb --region us-central1
+gcloud run jobs execute cron-ecb --region ${REGION}
 
 # View job logs
 gcloud logging read "resource.type=cloud_run_job AND resource.labels.job_name=cron-ecb" --limit 50
@@ -266,7 +276,7 @@ gcloud logging tail "resource.type=cloud_run_job" --format=json
 View job execution history:
 
 ```bash
-gcloud run jobs executions list --job cron-ecb --region us-central1
+gcloud run jobs executions list --job cron-ecb --region ${REGION}
 ```
 
 ## Troubleshooting
