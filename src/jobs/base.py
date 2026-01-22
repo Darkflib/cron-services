@@ -47,9 +47,12 @@ class BaseJob(ABC):
 
     def _cleanup_work_dir(self, work_dir: Path) -> None:
         """Clean up temporary work directory."""
-        if work_dir.exists():
-            shutil.rmtree(work_dir)
-            logger.info(f"Cleaned up {work_dir}")
+        try:
+            if work_dir.exists():
+                shutil.rmtree(work_dir)
+                logger.info(f"Cleaned up {work_dir}")
+        except OSError as e:
+            logger.warning(f"Failed to clean up {work_dir}: {e}")
 
     async def run(self) -> dict:
         """Run the job with setup and cleanup.
