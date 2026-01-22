@@ -42,3 +42,8 @@ time.txt
 renovate.json
 terraform/.terraform/
 terraform/*.tfstate*
+
+# Python cache
+.mypy_cache/
+.ruff_cache/
+
