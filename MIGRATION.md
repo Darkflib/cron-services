@@ -88,7 +88,11 @@ gcloud secrets versions access latest --secret=maxmind-license-key
 export IMAGE_URL=$(terraform output -raw artifact_registry_repository)/cron-services:latest
 
 # Configure authentication
-gcloud auth configure-docker $(echo ${IMAGE_URL} | cut -d'/' -f1)
+# Extract registry hostname more robustly
+REGISTRY_HOST=$(echo ${IMAGE_URL} | sed 's|^\([^/]*\)/.*|\1|')
+echo "Configuring authentication for registry: ${REGISTRY_HOST}"
+gcloud auth configure-docker ${REGISTRY_HOST}
+
 
 # Build container (from repository root)
 cd ..
