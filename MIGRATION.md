@@ -223,7 +223,7 @@ Create alert policies for job failures:
 
 ## Rollback Plan
 
-If issues arise, you can quickly rollback:
+If issues arise, you can quickly roll back:
 
 1. Re-enable GitHub Actions workflows:
    ```bash
