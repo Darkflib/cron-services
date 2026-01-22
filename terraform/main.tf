@@ -158,6 +158,17 @@ resource "google_cloud_run_v2_job" "jobs" {
   }
 }
 
+# Grant Cloud Run invoker permission to scheduler service account
+resource "google_cloud_run_v2_job_iam_member" "job_invoker" {
+  for_each = local.jobs
+
+  project  = var.project_id
+  location = var.region
+  job_name = google_cloud_run_v2_job.jobs[each.key].name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.job_sa.email}"
+}
+
 # Cloud Scheduler jobs to trigger Cloud Run Jobs
 resource "google_cloud_scheduler_job" "schedulers" {
   for_each = local.jobs
