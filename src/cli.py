@@ -32,9 +32,13 @@ async def run_job(job_name: str) -> int:
     job_class = JOBS[job_name]
     job = job_class()
 
-    result = await job.run()
+    try:
+        result = await job.run()
+    except Exception as e:
+        logger.exception(f"Job raised an exception: {e}")
+        return 1
 
-    if result["status"] == "success":
+    if isinstance(result, dict) and result.get("status") == "success":
         logger.info(f"Job completed successfully: {result}")
         return 0
     else:
