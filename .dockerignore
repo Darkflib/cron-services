@@ -29,6 +29,9 @@ venv/
 htmlcov/
 .tox/
 
+# Secrets
+.env*
+
 # Documentation
 *.md
 !README.md
