@@ -25,36 +25,30 @@ test:
 	uv run pytest
 
 lint:
-	uv run ruff check src/
+	uv run ruff check src/ tests/
 
 format:
-	uv run ruff format src/
-	uv run ruff check --fix src/
+	uv run ruff format src/ tests/
+	uv run ruff check --fix src/ tests/
 
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null || true
-	rm -rf dist/ build/ .venv/
+	rm -rf dist/ build/
 
-run-ecb:
-	uv run python -m src.main ecb
-
-run-geonames:
-	uv run python -m src.main geonames
-
-run-maxmind:
-	uv run python -m src.main maxmind
-
-run-ofcom:
-	uv run python -m src.main ofcom
-
-build-podman:
-	podman build -t cron-services:latest .
+distclean: clean
+	rm -rf .venv/
 
 run-podman:
+ifndef JOB
+	$(error JOB is required. Usage: make run-podman JOB=ecb|geonames|maxmind|ofcom)
+endif
 	podman run --rm -p 8080:8080 \
 		-e CRON_GCP_PROJECT_ID=${CRON_GCP_PROJECT_ID} \
 		-e CRON_GCS_BUCKET=${CRON_GCS_BUCKET} \
 		-e CRON_MAXMIND_LICENSE_KEY=${CRON_MAXMIND_LICENSE_KEY} \
 		cron-services:latest $(JOB)
+
+
+
