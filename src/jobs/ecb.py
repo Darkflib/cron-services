@@ -34,9 +34,7 @@ class ECBJob(BaseJob):
 
         # Upload to GCS
         if failed_downloads:
-            logger.error(
-                f"{len(failed_downloads)} downloads failed: {[d for d in failed_downloads]}"
-            )
+            logger.error("%d downloads failed: %s", len(failed_downloads), list(failed_downloads))
         uploaded = self.uploader.upload_directory(work_dir, self.gcs_prefix)
 
         result = {
