@@ -20,8 +20,8 @@ async def run_job(job_name: str) -> int:
         Exit code (0 for success, 1 for failure)
     """
     if job_name not in JOBS:
-        logger.error(f"Unknown job: {job_name}")
-        logger.info(f"Available jobs: {', '.join(JOBS.keys())}")
+        logger.error("Unknown job: %s", job_name)
+        logger.info("Available jobs: %s", ", ".join(JOBS.keys()))
         return 1
 
     job_class = JOBS[job_name]
@@ -30,14 +30,14 @@ async def run_job(job_name: str) -> int:
     try:
         result = await job.run()
     except Exception as e:
-        logger.exception(f"Job raised an exception: {e}")
+        logger.exception("Job raised an exception: %s", e)
         return 1
 
     if isinstance(result, dict) and result.get("status") == "success":
-        logger.info(f"Job completed successfully: {result}")
+        logger.info("Job completed successfully: %s", result)
         return 0
     else:
-        logger.error(f"Job failed: {result}")
+        logger.error("Job failed: %s", result)
         return 1
 
 
