@@ -24,7 +24,11 @@ class OfcomJob(BaseJob):
     def _load_urls(self) -> list[str]:
         """Load URLs from configuration file."""
         urls_file = Path(__file__).parent.parent.parent / self.URLS_FILE
+        if not urls_file.exists():
+            raise FileNotFoundError(f"URL configuration file not found: {urls_file}")
         urls = urls_file.read_text().strip().split("\n")
+        if not urls:
+            raise ValueError(f"No URLs found in {urls_file}")
         return [url.strip() for url in urls if url.strip()]
 
     async def execute(self) -> dict:
