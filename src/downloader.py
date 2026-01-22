@@ -1,8 +1,10 @@
 """File download utilities."""
 
 import asyncio
+import hashlib
 import logging
 from pathlib import Path
+from urllib.parse import urlparse, unquote
 
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -35,11 +37,14 @@ class FileDownloader:
         logger.info(f"Downloading {url}")
 
         async with httpx.AsyncClient(timeout=self.timeout, follow_redirects=True) as client:
-            response = await client.get(url)
-            response.raise_for_status()
-
-            dest_path.write_bytes(response.content)
-            logger.info(f"Downloaded {dest_path.name} ({len(response.content)} bytes)")
+            async with client.stream("GET", url) as response:
+                response.raise_for_status()
+                total_size = 0
+                with dest_path.open("wb") as f:
+                    async for chunk in response.aiter_bytes(chunk_size=8192):
+                        f.write(chunk)
+                        total_size += len(chunk)
+                logger.info(f"Downloaded {dest_path.name} ({total_size} bytes)")
 
         return dest_path
 
@@ -62,8 +67,19 @@ class FileDownloader:
 
         async def download_with_semaphore(url: str) -> Path:
             async with semaphore:
-                filename = url.split("/")[-1].split("?")[0]
+                parsed = urlparse(url)
+                filename = (
+                    unquote(parsed.path.split("/")[-1])
+                    or f"download_{hashlib.md5(url.encode()).hexdigest()[:8]}"
+                )
                 dest_path = dest_dir / filename
+                # Handle potential filename collisions
+                if dest_path.exists():
+                    stem, suffix = dest_path.stem, dest_path.suffix
+                    counter = 1
+                    while dest_path.exists():
+                        dest_path = dest_dir / f"{stem}_{counter}{suffix}"
+                        counter += 1
                 return await self.download_file(url, dest_path)
 
         tasks = [download_with_semaphore(url) for url in urls]
