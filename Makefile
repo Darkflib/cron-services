@@ -1,4 +1,4 @@
-.PHONY: help install dev test lint format clean run-api run-ecb run-geonames run-maxmind run-ofcom build-podman run-podman
+.PHONY: help install dev test lint format clean run-ecb run-geonames run-maxmind run-ofcom build-podman run-podman
 
 help:
 	@echo "Available commands:"
@@ -8,13 +8,12 @@ help:
 	@echo "  make lint         - Run linting"
 	@echo "  make format       - Format code"
 	@echo "  make clean        - Clean build artifacts"
-	@echo "  make run-api      - Run API server locally"
 	@echo "  make run-ecb      - Run ECB job locally"
 	@echo "  make run-geonames - Run Geonames job locally"
 	@echo "  make run-maxmind  - Run MaxMind job locally"
 	@echo "  make run-ofcom    - Run Ofcom job locally"
 	@echo "  make build-podman - Build container with podman"
-	@echo "  make run-podman   - Run container with podman"
+	@echo "  make run-podman   - Run container with podman (JOB=ecb|geonames|maxmind|ofcom)"
 
 install:
 	uv sync --no-dev
@@ -38,9 +37,6 @@ clean:
 	find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null || true
 	rm -rf dist/ build/ .venv/
 
-run-api:
-	uv run python -m src.main serve
-
 run-ecb:
 	uv run python -m src.main ecb
 
@@ -58,7 +54,7 @@ build-podman:
 
 run-podman:
 	podman run --rm -p 8080:8080 \
-		-e CRON_GCP_PROJECT_ID=${GCP_PROJECT_ID} \
-		-e CRON_GCS_BUCKET=${GCS_BUCKET} \
-		-e CRON_MAXMIND_LICENSE_KEY=${MAXMIND_LICENSE_KEY} \
-		cron-services:latest
+		-e CRON_GCP_PROJECT_ID=${CRON_GCP_PROJECT_ID} \
+		-e CRON_GCS_BUCKET=${CRON_GCS_BUCKET} \
+		-e CRON_MAXMIND_LICENSE_KEY=${CRON_MAXMIND_LICENSE_KEY} \
+		cron-services:latest $(JOB)
