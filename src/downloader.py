@@ -86,9 +86,9 @@ class FileDownloader:
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         downloaded = []
-        for result in results:
+        for url, result in zip(urls, results):
             if isinstance(result, Exception):
-                logger.error(f"Download failed: {result}")
+                logger.error(f"Download failed for {url}: {result}")
             else:
                 downloaded.append(result)
 
