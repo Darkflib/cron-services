@@ -24,14 +24,17 @@ class MaxMindJob(BaseJob):
 
     def _load_urls(self) -> list[str]:
         """Load URLs from configuration file and inject license key."""
-        urls_file = Path(__file__).parent.parent.parent / self.URLS_FILE
-        urls = urls_file.read_text().strip().split("\n")
-
-        # Replace placeholder with actual license key
+        # Validate license key first (fail fast)
         license_key = settings.maxmind_license_key
         if not license_key:
             msg = "MaxMind license key not configured"
             raise ValueError(msg)
+
+        urls_file = Path(__file__).parent.parent.parent / self.URLS_FILE
+        if not urls_file.exists():
+            raise FileNotFoundError(f"MaxMind URLs file not found: {urls_file}")
+
+        urls = urls_file.read_text().strip().split("\n")
 
         return [url.strip().replace("YOUR_LICENSE_KEY", license_key) for url in urls if url.strip()]
 
