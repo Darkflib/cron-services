@@ -27,6 +27,3 @@ htmlcov/
 
 # Local files
 time.txt
-
-# uv
-uv.lock
