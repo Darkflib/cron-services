@@ -7,11 +7,6 @@ import sys
 
 from .jobs import JOBS
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-
 logger = logging.getLogger(__name__)
 
 
@@ -19,7 +14,7 @@ async def run_job(job_name: str) -> int:
     """Run a specific job.
 
     Args:
-        job_name: Name of the job to run
+        job_name: Name of job to run
 
     Returns:
         Exit code (0 for success, 1 for failure)
@@ -63,8 +58,11 @@ def main():
 
     args = parser.parse_args()
 
-    # Update log level
-    logging.getLogger().setLevel(getattr(logging, args.log_level))
+    # Configure logging
+    logging.basicConfig(
+        level=getattr(logging, args.log_level),
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
 
     # Run job
     exit_code = asyncio.run(run_job(args.job))
