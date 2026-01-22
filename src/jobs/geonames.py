@@ -25,7 +25,8 @@ class GeonamesJob(BaseJob):
         """Load URLs from configuration file."""
         urls_file = Path(__file__).parent.parent.parent / self.URLS_FILE
         if not urls_file.exists():
-            raise FileNotFoundError(f"Geonames URLs configuration file not found: {urls_file}")
+            error_msg = "Geonames URLs configuration file not found: " + str(urls_file)
+            raise FileNotFoundError(error_msg)
         urls = urls_file.read_text().strip().split("\n")
         return [url.strip() for url in urls if url.strip()]
 
@@ -35,7 +36,7 @@ class GeonamesJob(BaseJob):
 
         # Load URLs from file
         urls = self._load_urls()
-        logger.info(f"Loaded {len(urls)} URLs from {self.URLS_FILE}")
+        logger.info("Loaded %d URLs from %s", len(urls), self.URLS_FILE)
 
         # Download files with more parallelism
         downloaded = await self.downloader.download_urls(urls, work_dir, max_concurrent=6)
