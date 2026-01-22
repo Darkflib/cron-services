@@ -10,7 +10,7 @@ This document describes the migration from GitHub Actions workflows to GCP Cloud
 - [ ] Required GCP APIs enabled
 - [ ] `gcloud` CLI installed and configured
 - [ ] Terraform installed (>= 1.5)
-- [ ] MaxMind license key obtained
+- [ ] MaxMind licence key obtained
 - [ ] Backup of current GitHub Actions workflows
 
 ### Understand Current Setup
