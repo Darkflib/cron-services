@@ -217,7 +217,7 @@ The original GitHub Actions workflows have been replaced with this GCP-based sol
 
 ### Code Structure
 
-```
+```text
 src/
 ├── __init__.py
 ├── cli.py              # CLI entry point
