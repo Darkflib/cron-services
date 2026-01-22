@@ -1,10 +1,23 @@
 """Google Cloud Storage operations."""
 
 import logging
+import os
+import shutil
 from pathlib import Path
+from unittest.mock import MagicMock
 
-from google.cloud import storage
-from google.api_core.exceptions import GoogleAPIError
+USE_LOCAL_MOCK = os.getenv("USE_LOCAL_MOCK", "").lower() in ("true", "1", "yes")
+
+if USE_LOCAL_MOCK:
+    print("⚠️ RUNNING IN LOCAL MOCK MODE - Writing to ./local_storage")
+    storage = MagicMock()
+    storage.Client = MagicMock
+
+    GoogleAPIError = Exception
+else:
+    from google.cloud import storage
+    from google.api_core.exceptions import GoogleAPIError
+
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from .config import settings
@@ -20,9 +33,16 @@ class GCSUploader:
         bucket_name: str | None = None,
     ) -> None:
         """Initialize GCS client."""
-        self.client = storage.Client(project=settings.gcp_project_id)
-        self.bucket_name = bucket_name or settings.gcs_bucket
-        self.bucket = self.client.bucket(self.bucket_name)
+        if USE_LOCAL_MOCK:
+            self.client = storage.Client()
+            self.bucket_name = bucket_name or "mock-bucket"
+            self.bucket = self.client.bucket(self.bucket_name)
+            self._mock_mode = True
+        else:
+            self.client = storage.Client(project=settings.gcp_project_id)
+            self.bucket_name = bucket_name or settings.gcs_bucket
+            self.bucket = self.client.bucket(self.bucket_name)
+            self._mock_mode = False
 
     @retry(
         stop=stop_after_attempt(3),
@@ -46,9 +66,17 @@ class GCSUploader:
         # Ensure no double slash in GCS path
         gcs_path = gcs_path.lstrip("/")
 
-        blob = self.bucket.blob(gcs_path)
-        blob.upload_from_filename(str(local_path))
-        logger.info(f"Uploaded {local_path.name} to gs://{self.bucket_name}/{gcs_path}")
+        if self._mock_mode:
+            local_storage_dir = Path("./local_storage")
+            local_storage_dir.mkdir(exist_ok=True)
+            dest_path = local_storage_dir / Path(local_path).name
+            shutil.copy(local_path, dest_path)
+            logger.info(f"Mock upload: {local_path} -> {dest_path}")
+            logger.info(f"Uploaded {local_path.name} to gs://{self.bucket_name}/{gcs_path}")
+        else:
+            blob = self.bucket.blob(gcs_path)
+            blob.upload_from_filename(str(local_path))
+            logger.info(f"Uploaded {local_path.name} to gs://{self.bucket_name}/{gcs_path}")
 
     def upload_directory(self, local_dir: Path, gcs_prefix: str) -> list[str]:
         """Upload all files from a directory to GCS.
