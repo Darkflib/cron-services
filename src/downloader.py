@@ -4,7 +4,7 @@ import asyncio
 import hashlib
 import logging
 from pathlib import Path
-from urllib.parse import urlparse, unquote
+from urllib.parse import unquote, urlparse
 
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -34,7 +34,7 @@ class FileDownloader:
         Returns:
             Path to downloaded file
         """
-        logger.info(f"Downloading {url}")
+        logger.info("Downloading %s", url)
 
         async with httpx.AsyncClient(timeout=self.timeout, follow_redirects=True) as client:
             async with client.stream("GET", url) as response:
@@ -44,7 +44,7 @@ class FileDownloader:
                     async for chunk in response.aiter_bytes(chunk_size=8192):
                         f.write(chunk)
                         total_size += len(chunk)
-                logger.info(f"Downloaded {dest_path.name} ({total_size} bytes)")
+                logger.info("Downloaded %s (%d bytes)", dest_path.name, total_size)
 
         return dest_path
 
@@ -86,11 +86,11 @@ class FileDownloader:
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         downloaded = []
-        for url, result in zip(urls, results):
+        for url, result in zip(urls, results, strict=True):
             if isinstance(result, Exception):
-                logger.error(f"Download failed for {url}: {result}")
+                logger.error("Download failed for %s: %s", url, result)
             else:
                 downloaded.append(result)
 
-        logger.info(f"Downloaded {len(downloaded)}/{len(urls)} files successfully")
+        logger.info("Downloaded %d/%d files successfully", len(downloaded), len(urls))
         return downloaded
