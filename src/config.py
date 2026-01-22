@@ -34,7 +34,8 @@ class Settings:
         if not self.maxmind_license_key:
             missing.append("CRON_MAXMIND_LICENSE_KEY")
         if missing:
-            raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
+            missing_vars_msg = "Missing required environment variables: " + ", ".join(missing)
+            raise ValueError(missing_vars_msg)
 
 
 settings = Settings()
