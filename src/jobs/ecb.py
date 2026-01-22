@@ -30,12 +30,22 @@ class ECBJob(BaseJob):
 
         # Download files
         downloaded = await self.downloader.download_urls(self.URLS, work_dir)
+        failed_downloads = [d for d in downloaded if isinstance(d, Exception)]
 
         # Upload to GCS
+        if failed_downloads:
+            logger.error(
+                f"{len(failed_downloads)} downloads failed: {[d for d in failed_downloads]}"
+            )
         uploaded = self.uploader.upload_directory(work_dir, self.gcs_prefix)
 
-        return {
-            "downloaded": len(downloaded),
+        result = {
+            "downloaded": len(downloaded) - len(failed_downloads),
             "uploaded": len(uploaded),
             "files": [f.name for f in downloaded],
         }
+
+        if failed_downloads:
+            result["errors"] = [str(e) for e in failed_downloads]
+
+        return result
