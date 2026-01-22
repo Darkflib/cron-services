@@ -37,7 +37,7 @@ class MaxMindJob(BaseJob):
 
     async def execute(self) -> dict:
         """Download MaxMind data and upload to GCS."""
-        work_dir = self._create_work_dir()
+        work_dir = self.temp_dir / self.name
 
         # Load URLs with license key injected
         urls = self._load_urls()

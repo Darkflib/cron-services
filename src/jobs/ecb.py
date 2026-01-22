@@ -26,7 +26,7 @@ class ECBJob(BaseJob):
 
     async def execute(self) -> dict:
         """Download ECB data and upload to GCS."""
-        work_dir = self._create_work_dir()
+        work_dir = self.temp_dir / self.name
 
         # Download files
         downloaded = await self.downloader.download_urls(self.URLS, work_dir)

@@ -29,7 +29,7 @@ class GeonamesJob(BaseJob):
 
     async def execute(self) -> dict:
         """Download Geonames data and upload to GCS."""
-        work_dir = self._create_work_dir()
+        work_dir = self.temp_dir / self.name
 
         # Load URLs from file
         urls = self._load_urls()
