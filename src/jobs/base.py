@@ -50,9 +50,9 @@ class BaseJob(ABC):
         try:
             if work_dir.exists():
                 shutil.rmtree(work_dir)
-                logger.info(f"Cleaned up {work_dir}")
+                logger.info("Cleaned up %s", work_dir)
         except OSError as e:
-            logger.warning(f"Failed to clean up {work_dir}: {e}")
+            logger.warning("Failed to clean up %s: %s", work_dir, e)
 
     async def run(self) -> dict:
         """Run the job with setup and cleanup.
@@ -62,12 +62,12 @@ class BaseJob(ABC):
         """
         work_dir = self._create_work_dir()
         try:
-            logger.info(f"Starting job: {self.name}")
+            logger.info("Starting job: %s", self.name)
             result = await self.execute()
-            logger.info(f"Completed job: {self.name}")
+            logger.info("Completed job: %s", self.name)
             return {"status": "success", "job": self.name, **result}
         except Exception as e:
-            logger.exception(f"Job {self.name} failed: {e}")
+            logger.exception("Job %s failed: %s", self.name, e)
             return {"status": "error", "job": self.name, "error": str(e)}
         finally:
             self._cleanup_work_dir(work_dir)
