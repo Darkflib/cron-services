@@ -35,13 +35,15 @@ class MaxMindJob(BaseJob):
             error_msg = "MaxMind URLs file not found: " + str(urls_file)
             raise FileNotFoundError(error_msg)
 
-        urls = urls_file.read_text().strip().split("\n")
+        # Read and split the file, then filter out empty/whitespace-only entries
+        urls = [url.strip().replace("YOUR_LICENSE_KEY", license_key) for url in urls_file.read_text().split("\n") if url.strip()]
+        if not urls:
+            error_msg = "No URLs found in " + str(urls_file)
+            raise ValueError(error_msg)
+        return urls
 
-        return [url.strip().replace("YOUR_LICENSE_KEY", license_key) for url in urls if url.strip()]
-
-    async def execute(self) -> dict:
+    async def execute(self, work_dir: Path) -> dict:
         """Download MaxMind data and upload to GCS."""
-        work_dir = self.temp_dir / self.name
 
         # Load URLs with license key injected
         urls = self._load_urls()
