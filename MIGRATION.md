@@ -77,8 +77,8 @@ echo -n "YOUR_MAXMIND_LICENSE_KEY" > /tmp/maxmind-key.txt
 gcloud secrets versions add maxmind-license-key --data-file=/tmp/maxmind-key.txt
 rm /tmp/maxmind-key.txt
 
-# Verify secret
-gcloud secrets versions access latest --secret=maxmind-license-key
+# Verify secret exists (without exposing the value)
+gcloud secrets versions list maxmind-license-key
 ```
 
 ### Step 4: Build and Deploy Container
