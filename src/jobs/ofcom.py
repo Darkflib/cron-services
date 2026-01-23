@@ -27,15 +27,15 @@ class OfcomJob(BaseJob):
         if not urls_file.exists():
             error_msg = "URL configuration file not found: " + str(urls_file)
             raise FileNotFoundError(error_msg)
-        urls = urls_file.read_text().strip().split("\n")
+        # Read and split the file, then filter out empty/whitespace-only entries
+        urls = [url.strip() for url in urls_file.read_text().split("\n") if url.strip()]
         if not urls:
             error_msg = "No URLs found in " + str(urls_file)
             raise ValueError(error_msg)
-        return [url.strip() for url in urls if url.strip()]
+        return urls
 
-    async def execute(self) -> dict:
+    async def execute(self, work_dir: Path) -> dict:
         """Download Ofcom data and upload to GCS."""
-        work_dir = self.temp_dir / self.name
 
         # Load URLs from file
         urls = self._load_urls()
