@@ -20,6 +20,7 @@ class BaseJob(ABC):
         self.downloader = FileDownloader()
         self.uploader = GCSUploader()
         self.temp_dir = Path(settings.temp_dir)
+        self.work_dir: Path | None = None
 
     @property
     @abstractmethod
@@ -32,8 +33,11 @@ class BaseJob(ABC):
         """GCS path prefix for uploads."""
 
     @abstractmethod
-    async def execute(self) -> dict:
+    async def execute(self, work_dir: Path) -> dict:
         """Execute the job.
+
+        Args:
+            work_dir: Temporary working directory for the job
 
         Returns:
             Dict with job results
@@ -61,9 +65,10 @@ class BaseJob(ABC):
             Dict with job results and status
         """
         work_dir = self._create_work_dir()
+        self.work_dir = work_dir
         try:
             logger.info("Starting job: %s", self.name)
-            result = await self.execute()
+            result = await self.execute(work_dir)
             logger.info("Completed job: %s", self.name)
             return {"status": "success", "job": self.name, **result}
         except Exception as e:
@@ -71,3 +76,4 @@ class BaseJob(ABC):
             return {"status": "error", "job": self.name, "error": str(e)}
         finally:
             self._cleanup_work_dir(work_dir)
+            self.work_dir = None
