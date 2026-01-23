@@ -106,6 +106,7 @@ export IMAGE_URL="${REGION}-docker.pkg.dev/${PROJECT_ID}/cron-services/cron-serv
 
 # Configure Docker/Podman for Artifact Registry
 gcloud auth configure-docker ${REGION}-docker.pkg.dev
+```
 
 ### Create Artifact Registry Repository
 
@@ -115,7 +116,6 @@ gcloud artifacts repositories create cron-services \
   --repository-format=docker \
   --location=${REGION} \
   --description="Cron services container images"
-```
 
 # Build and push
 podman build -t ${IMAGE_URL} .
