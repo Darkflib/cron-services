@@ -1,6 +1,7 @@
 """ECB (European Central Bank) forex data sync job."""
 
 import logging
+from pathlib import Path
 
 from .base import BaseJob
 
@@ -24,13 +25,13 @@ class ECBJob(BaseJob):
     def gcs_prefix(self) -> str:
         return "ecb"
 
-    async def execute(self) -> dict:
+    async def execute(self, work_dir: Path) -> dict:
         """Download ECB data and upload to GCS."""
-        work_dir = self.temp_dir / self.name
 
         # Download files
         downloaded = await self.downloader.download_urls(self.URLS, work_dir)
         failed_downloads = [d for d in downloaded if isinstance(d, Exception)]
+        successful_downloads = [d for d in downloaded if not isinstance(d, Exception)]
 
         # Upload to GCS
         if failed_downloads:
@@ -38,9 +39,9 @@ class ECBJob(BaseJob):
         uploaded = self.uploader.upload_directory(work_dir, self.gcs_prefix)
 
         result = {
-            "downloaded": len(downloaded) - len(failed_downloads),
+            "downloaded": len(successful_downloads),
             "uploaded": len(uploaded),
-            "files": [f.name for f in downloaded],
+            "files": [f.name for f in successful_downloads],
         }
 
         if failed_downloads:
