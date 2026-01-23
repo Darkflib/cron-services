@@ -1,4 +1,4 @@
-.PHONY: help install dev test lint format clean run-ecb run-geonames run-maxmind run-ofcom build-podman run-podman
+.PHONY: help install dev test lint format clean distclean run-podman
 
 help:
 	@echo "Available commands:"
@@ -8,11 +8,7 @@ help:
 	@echo "  make lint         - Run linting"
 	@echo "  make format       - Format code"
 	@echo "  make clean        - Clean build artifacts"
-	@echo "  make run-ecb      - Run ECB job locally"
-	@echo "  make run-geonames - Run Geonames job locally"
-	@echo "  make run-maxmind  - Run MaxMind job locally"
-	@echo "  make run-ofcom    - Run Ofcom job locally"
-	@echo "  make build-podman - Build container with podman"
+	@echo "  make distclean    - Clean build artifacts and remove virtual environment"
 	@echo "  make run-podman   - Run container with podman (JOB=ecb|geonames|maxmind|ofcom)"
 
 install:
