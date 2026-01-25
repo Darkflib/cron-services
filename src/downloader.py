@@ -6,6 +6,7 @@ import logging
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
+import aiofiles
 import httpx
 from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
@@ -39,10 +40,17 @@ def is_retryable_exception(exception: Exception) -> bool:
 class FileDownloader:
     """Async file downloader with retry logic."""
 
-    def __init__(self, timeout: int = 300):
-        """Initialize downloader with timeout."""
+    def __init__(self, timeout: int = 300, log_urls: bool = True):
+        """Initialize downloader with timeout.
+
+        Args:
+            timeout: Request timeout in seconds
+            log_urls: Whether to log URLs (set to False for sensitive URLs)
+        """
         self.timeout = timeout
         self._path_alloc_lock = asyncio.Lock()
+        self._allocated_paths: set[Path] = set()
+        self._log_urls = log_urls
 
     @retry(
         stop=stop_after_attempt(3),
@@ -60,15 +68,18 @@ class FileDownloader:
         Returns:
             Path to downloaded file
         """
-        logger.info("Downloading %s", url)
+        if self._log_urls:
+            logger.info("Downloading %s", url)
+        else:
+            logger.info("Downloading file (URL hidden for security)")
 
         async with httpx.AsyncClient(timeout=self.timeout, follow_redirects=True) as client:
             async with client.stream("GET", url) as response:
                 response.raise_for_status()
                 total_size = 0
-                with dest_path.open("wb") as f:
+                async with aiofiles.open(dest_path, "wb") as f:
                     async for chunk in response.aiter_bytes(chunk_size=8192):
-                        f.write(chunk)
+                        await f.write(chunk)
                         total_size += len(chunk)
                 logger.info("Downloaded %s (%d bytes)", dest_path.name, total_size)
 
@@ -101,14 +112,22 @@ class FileDownloader:
                 # Handle potential filename collisions with lock
                 async with self._path_alloc_lock:
                     dest_path = dest_dir / filename
-                    if dest_path.exists():
+                    # Find a path that is not on disk and not in allocated set
+                    while dest_path.exists() or dest_path in self._allocated_paths:
                         stem, suffix = dest_path.stem, dest_path.suffix
                         counter = 1
-                        while dest_path.exists():
+                        while dest_path.exists() or dest_path in self._allocated_paths:
                             dest_path = dest_dir / f"{stem}_{counter}{suffix}"
                             counter += 1
+                    # Reserve the path before releasing the lock
+                    self._allocated_paths.add(dest_path)
                 # Download outside the lock to allow concurrent downloads
-                return await self.download_file(url, dest_path)
+                try:
+                    result = await self.download_file(url, dest_path)
+                    return result
+                finally:
+                    # Clean up the reservation in both success and exception paths
+                    self._allocated_paths.discard(dest_path)
 
         tasks = [download_with_semaphore(url) for url in urls]
         results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -116,7 +135,10 @@ class FileDownloader:
         downloaded = []
         for url, result in zip(urls, results, strict=True):
             if isinstance(result, Exception):
-                logger.error("Download failed for %s: %s", url, result)
+                if self._log_urls:
+                    logger.error("Download failed for %s: %s", url, result)
+                else:
+                    logger.error("Download failed (URL hidden for security): %s", result)
             else:
                 downloaded.append(result)
 
