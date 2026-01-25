@@ -2,6 +2,7 @@
 
 import logging
 import shutil
+import tempfile
 from abc import ABC, abstractmethod
 from pathlib import Path
 
@@ -44,9 +45,8 @@ class BaseJob(ABC):
         """
 
     def _create_work_dir(self) -> Path:
-        """Create a temporary work directory."""
-        work_dir = self.temp_dir / self.name
-        work_dir.mkdir(parents=True, exist_ok=True)
+        """Create a unique temporary work directory per run."""
+        work_dir = Path(tempfile.mkdtemp(dir=self.temp_dir, prefix=f"{self.name}_"))
         return work_dir
 
     def _cleanup_work_dir(self, work_dir: Path) -> None:
