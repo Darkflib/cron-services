@@ -190,14 +190,12 @@ Create log-based metrics:
 # Job success rate metric
 gcloud logging metrics create job_success_rate \
   --description="Cloud Run Job success rate" \
-  --log-filter='resource.type="cloud_run_job"
-    jsonPayload.message="Completed job"'
+  --log-filter='resource.type="cloud_run_job" jsonPayload.message="Completed job"'
 
 # Job failure metric
 gcloud logging metrics create job_failures \
   --description="Cloud Run Job failures" \
-  --log-filter='resource.type="cloud_run_job"
-    severity>=ERROR'
+  --log-filter='resource.type="cloud_run_job" severity>=ERROR'
 ```
 
 ### Alerting Setup
@@ -223,10 +221,17 @@ Create alert policies for job failures:
    ```
 
 3. Monitor costs:
-   ```bash
-   # View Cloud Run costs
-   gcloud billing projects describe ${PROJECT_ID}
-   ```
+    ```bash
+    # View detailed costs in Cloud Console
+    # https://console.cloud.google.com/billing/${PROJECT_ID}/reports
+    
+    # List Cloud Run resources for inventory
+    gcloud run services list
+    gcloud run jobs list
+    
+    # For programmatic cost analysis, enable BigQuery billing export:
+    # https://cloud.google.com/billing/docs/how-to/export-data-bigquery
+    ```
 
 ## Rollback Plan
 
