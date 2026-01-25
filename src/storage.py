@@ -66,8 +66,8 @@ class GCSUploader:
 
         if self._mock_mode:
             local_storage_dir = Path("./local_storage")
-            local_storage_dir.mkdir(exist_ok=True)
-            dest_path = local_storage_dir / Path(local_path).name
+            dest_path = local_storage_dir / Path(gcs_path)
+            dest_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy(local_path, dest_path)
             logger.info("Mock upload: %s -> %s", local_path, dest_path)
             logger.info("Uploaded %s to gs://%s/%s", local_path.name, self.bucket_name, gcs_path)
