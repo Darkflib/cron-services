@@ -1,0 +1,49 @@
+# Git
+.git
+.gitignore
+.github
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+*.egg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Secrets
+.env*
+
+# Documentation
+*.md
+!README.md
+
+# Other
+.DS_Store
+time.txt
+renovate.json
+terraform/.terraform/
+terraform/*.tfstate*
+
+# Python cache
+.mypy_cache/
+.ruff_cache/
+
