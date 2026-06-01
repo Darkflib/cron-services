@@ -1,0 +1,36 @@
+id: ecb-sync
+description: Download ECB euro reference exchange rates and sync to Google Drive
+enabled: true
+exec:
+  mode: command
+  working_directory: /home/mike/cron-services
+  command:
+    - /usr/bin/bash
+    - /home/mike/cron-services/scripts/ecb-sync.sh
+schedule:
+  # was: cron '0 18 * * *'
+  on_calendar: "*-*-* 18:00:00"
+  persistent: true
+  randomized_delay_sec: 300
+environment:
+  variables:
+    PATH: /home/mike/.local/bin:/usr/local/bin:/usr/bin:/bin
+timeout_sec: 600
+restart:
+  policy: on-failure
+  restart_sec: 120
+  start_limit_burst: 3
+  start_limit_interval_sec: 3600
+security:
+  # 'basic' keeps $HOME writable so rclone can refresh its OAuth token back
+  # into ~/.config/rclone/rclone.conf. read_write_paths document the writable
+  # surface and make a later bump to readonly-home/strict safe.
+  profile: basic
+  read_write_paths:
+    - /home/mike/.config/rclone
+    - /home/mike/.cache/cron-services
+resources:
+  memory_max: 512M
+  cpu_quota: "75%"
+metadata:
+  migrated_from: .github/workflows/ecb.yml

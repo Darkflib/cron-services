@@ -1,0 +1,33 @@
+id: geonames-sync
+description: Download Geonames geographic dumps and sync to Google Drive
+enabled: true
+exec:
+  mode: command
+  working_directory: /home/mike/cron-services
+  command:
+    - /usr/bin/bash
+    - /home/mike/cron-services/scripts/geonames-sync.sh
+schedule:
+  # was: cron '20 5 5 * *' (5th of each month)
+  on_calendar: "*-*-05 05:20:00"
+  persistent: true
+  randomized_delay_sec: 600
+environment:
+  variables:
+    PATH: /home/mike/.local/bin:/usr/local/bin:/usr/bin:/bin
+timeout_sec: 3600
+restart:
+  policy: on-failure
+  restart_sec: 300
+  start_limit_burst: 3
+  start_limit_interval_sec: 7200
+security:
+  profile: basic
+  read_write_paths:
+    - /home/mike/.config/rclone
+    - /home/mike/.cache/cron-services
+resources:
+  memory_max: 1G
+  cpu_quota: "75%"
+metadata:
+  migrated_from: .github/workflows/geonames.yml
