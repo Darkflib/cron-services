@@ -3,10 +3,10 @@ description: Download MaxMind GeoLite2 databases and sync to Google Drive
 enabled: true
 exec:
   mode: command
-  working_directory: /home/mike/cron-services
+  working_directory: @@REPO_ROOT@@
   command:
     - /usr/bin/bash
-    - /home/mike/cron-services/scripts/maxmind-sync.sh
+    - @@REPO_ROOT@@/scripts/maxmind-sync.sh
 schedule:
   # was: cron '20 5 * * *'
   on_calendar: "*-*-* 05:20:00"
@@ -14,10 +14,10 @@ schedule:
   randomized_delay_sec: 300
 environment:
   variables:
-    PATH: /home/mike/.local/bin:/usr/local/bin:/usr/bin:/bin
+    PATH: @@HOME@@/.local/bin:/usr/local/bin:/usr/bin:/bin
   files:
     # Provides MAXMIND_KEY. Create from deploy/maxmind.env.example (chmod 600).
-    - /home/mike/.config/cron-services/maxmind.env
+    - @@HOME@@/.config/cron-services/maxmind.env
 timeout_sec: 1800
 restart:
   policy: on-failure
@@ -27,8 +27,8 @@ restart:
 security:
   profile: basic
   read_write_paths:
-    - /home/mike/.config/rclone
-    - /home/mike/.cache/cron-services
+    - @@HOME@@/.config/rclone
+    - @@HOME@@/.cache/cron-services
 resources:
   memory_max: 512M
   cpu_quota: "75%"

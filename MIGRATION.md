@@ -7,8 +7,8 @@ renders declarative YAML into systemd `--user` service + timer units.
 ## What changed
 
 Each old GitHub Actions workflow becomes a shell script (in `scripts/`) plus a
-wfctl workflow definition (in `wfctl/`). The download + `rclone sync` logic is
-unchanged; only the execution substrate moves.
+wfctl workflow definition **template** (in `wfctl/templates/`). The download +
+`rclone sync` logic is unchanged; only the execution substrate moves.
 
 | Old workflow | Script | wfctl id | Schedule (was cron) | rclone target |
 |---|---|---|---|---|
@@ -18,9 +18,11 @@ unchanged; only the execution substrate moves.
 | `ofcom.yml` | `scripts/ofcom-sync.sh` | `ofcom-sync` | `*-*-05 05:20:00` (`20 5 5 * *`) | `gdrive:codelist/` |
 | `scheduled.yml` | — | — | dropped (GitHub-only heartbeat) | — |
 
-> All wfctl definitions assume the home directory is `/home/mike`. If you deploy
-> as a different user, adjust the absolute paths in `wfctl/*.yaml` and the
-> `PATH` variable accordingly.
+> **Paths are autoconfigured.** wfctl requires absolute paths in its YAML, so
+> the definitions in `wfctl/templates/` use `@@REPO_ROOT@@` and `@@HOME@@`
+> tokens. `deploy/install.sh` renders them into `~/.config/wfctl/workflows/`
+> with this checkout's actual location and `$HOME` substituted in — so the repo
+> works wherever it is cloned and for any user, with no hand-editing.
 
 ## Notable differences from the GitHub Actions version
 
@@ -50,7 +52,7 @@ unchanged; only the execution substrate moves.
 ## Deploy
 
 ```bash
-./deploy/install.sh      # copies definitions, validates, shows the plan
+./deploy/install.sh      # renders definitions, validates, shows the plan
 # review the plan, then:
 wfctl apply              # write units + enable timers
 wfctl run ecb-sync --wait
