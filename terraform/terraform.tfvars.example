@@ -1,0 +1,7 @@
+# Copy this file to terraform.tfvars and update values
+#
+# GCP project identifier: The unique ID of your Google Cloud Platform project where resources will be deployed
+project_id = "your-gcp-project-id"
+
+# Deployment region: The GCP region where resources will be created (default example: us-central1; replace if needed)
+region     = "us-central1"
