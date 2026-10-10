@@ -17,11 +17,10 @@ jobs:
       - name: add license to urls and download
         run: |
           mkdir codelist && cd codelist
-          #cat ../ofcom-urls.txt | xargs -n1 -P2 wget -v --content-disposition 
-          # seeing 403 errors, need to see the errors etc.
-          curl -Sv "https://www.ofcom.org.uk/siteassets/resources/documents/phones-telecoms-and-internet/information-for-industry/numbering/regular-updates/telephone-numbers/codelist.zip" > codelist.zip
-          file codelist.zip # get magic for type identification
-          cat codelist.zip |strings # see if there is anything readable
+          # --fail: a 403 block page must fail the job, not be saved as the zip.
+          curl --fail --silent --show-error --location -o codelist.zip "https://www.ofcom.org.uk/siteassets/resources/documents/phones-telecoms-and-internet/information-for-industry/numbering/regular-updates/telephone-numbers/codelist.zip"
+          # ...and a 200 that is not a zip must not reach the sync step either.
+          unzip -tq codelist.zip
 
       - name: list files
         run: |
